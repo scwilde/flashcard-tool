@@ -1,4 +1,8 @@
 #!/bin/bash
-cd "/home/samwi/Documents/School/Flashcard Tool"
+APP_DIR="$(dirname "${BASH_SOURCE[0]}")"
 
-exec .venv/bin/python main.py "$@"
+# echo "Working Directory: $(pwd)"
+# echo "App Directory: $(realpath $APP_DIR/main.py)"
+# echo "Python Directory: $(realpath $APP_DIR/.venv/bin/python)"
+
+exec "$APP_DIR/.venv/bin/python" "$APP_DIR/main.py" "$@"
