@@ -1,34 +1,81 @@
+-[X] Make sure script actually works
 -[] interface
     -[] review-async
         Generates an audio file to listen to to study while doing other things
-        --reverse, -r
+        -[] --reverse, -r
             play the content and then the card title
-        --shuffle, -s
+        -[] --shuffle, -s
             play cards in a random order
-        --answer-time n
+        -[] --answer-time n
             Amount of time in seconds between reading the question and reading the answer
     -[] review
         Displays cards one at a time on screen and waits for the answer
-        --reverse
+        -[] --reverse
             play the card content and then the title
-        --shuffle
+        -[] --shuffle
             play cards in random order
-        --tts
+        -[] --tts
             enable text-to-speech for reading out card titles and answers
     -[] init
         Turns a folder of card-like files into a deck of flash cards
     -[] info
         Prints info about the current deck
 -[] async review
-    -[] Loads all cards
+    -[] Load all cards
     -[] reject all image cards
         -[] print how many image cards are not being studied
-        -[] if therea re no cards that raent images, end the review
+        -[] if there are no cards that raent images, end the review
     -[] count how many non-image cards are in each bucket
     -[] print which buckets need study and how many cards there are
     -[] iterate through each card
+        -[] Convert the front and back of each card to audio data using Piper
+        -[] Concatenate that to a rolling audio file, creating chapter breaks for each card
+    -[] roll the final audio file into study.m4b
+    -[] mark the deck as being under asynchronous review
+    -[] The next time the deck is reviewed synchronously or asynchronously inform the user that the deck is under synchronous review. Ask if they would like to do a retrospective on said review or if they want to cancel it or if they want to exit
+    -[] if they say yes to the retrospective
+        -[] List each card one at a time that was in the retrospective. User respondes either y or n to whether they correctly answered the card during the asynchronous review.
+            -[] Cards marked yes move on to the next bucket, card marked no move back to bucket 0
 -[] synchronous review
     -[] Load all cards
     -[] count how many cards are in each bucket
     -[] print which buckets need study and how many cards there are
-    -[] if TTS enabled
+    -[] wait for the user to confirm they are ready
+    -[] in regular mode
+        -[] Display front of the next card in the deck. If TTS enabled, speak it out with Piper.
+        -[] Text answer
+            -[] wait for the user to type in the answer to the card, stripping any discritics for the answer check
+            -[] If it is incorrect, inform the user that it was incorrect and move the card to bucket 0. Ask the user if they want to try again.
+            -[] If incorrect again, show the correct answer and wait for the confirmation to move forward.
+            -[] If correct the first time, inform the user and move the card to the next bucket in the chain.
+        -[] image answer
+            -[] Wait for the user to confirm they are ready to see the answer
+            -[] Display the image and listen to close the window when the user presses any key.
+            -[] Ask if the user got the answer correct. If they say yes, move the card to the next bucket in the chain. If they say no, move the card back to bucket 0
+    -[] in flip mode
+        -[] display the body of the card, either image or text. if text and TTS enabled then speak it out.
+        -[] wait for the front of the card to be typed in
+        -[] If correct, move to the next bucket in the chain
+        -[] If incorrect, move to bucket 0 and ask if the user wants to try again
+        -[] If incorrect again, display what the front of the card says and wait for the user to say they are ready to move on to the next card
+-[] init
+    -[] Check if the deck has already been initialized
+        -[] if it has, check when it was last initialized and see if any files have changed since then
+            -[] if they have, inform the user and ask if they want to update the deck's metadata
+        -[] if it has not, create a .deck.json file
+            format:
+                "buckets": [
+                    { "size": int }
+                ],
+                "cards": [
+                    {
+                        "path": "",
+                        "bucket": int,
+                        "async study": bool,
+                    },
+                ],
+            buckets is an array that defines both how many buckets there are and how many cards are allowed to be in each bucket before it is added to a study. setting the bucket to a size of 0 will make the bucket always be added to the study if any cards are inside it.
+            cards is an array that defines each card, which bucket it is sitting in, and whether it is part of an outstanding asynchronous study.
+            -[] Ask the user how many buckets they would like to add. minimum of 1.
+            -[] Then ask how large each bucket should be. if there is only one bucket then don't ask and just set the size to 0. If they just hit enter on the first without entering a number then have the first bucket be 0, second 2, and each subsequent bucket double the previous.
+            -[] recursively look through folders and add each file in the directory as an entry in the json
