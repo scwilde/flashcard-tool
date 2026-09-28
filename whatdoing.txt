@@ -1,0 +1,34 @@
+-[] interface
+    -[] review-async
+        Generates an audio file to listen to to study while doing other things
+        --reverse, -r
+            play the content and then the card title
+        --shuffle, -s
+            play cards in a random order
+        --answer-time n
+            Amount of time in seconds between reading the question and reading the answer
+    -[] review
+        Displays cards one at a time on screen and waits for the answer
+        --reverse
+            play the card content and then the title
+        --shuffle
+            play cards in random order
+        --tts
+            enable text-to-speech for reading out card titles and answers
+    -[] init
+        Turns a folder of card-like files into a deck of flash cards
+    -[] info
+        Prints info about the current deck
+-[] async review
+    -[] Loads all cards
+    -[] reject all image cards
+        -[] print how many image cards are not being studied
+        -[] if therea re no cards that raent images, end the review
+    -[] count how many non-image cards are in each bucket
+    -[] print which buckets need study and how many cards there are
+    -[] iterate through each card
+-[] synchronous review
+    -[] Load all cards
+    -[] count how many cards are in each bucket
+    -[] print which buckets need study and how many cards there are
+    -[] if TTS enabled

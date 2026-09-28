@@ -1,0 +1,4 @@
+#!/bin/bash
+cd "/home/samwi/Documents/School/Flashcard Tool"
+
+exec .venv/bin/python main.py "$@"
