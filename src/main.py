@@ -2,8 +2,7 @@ from pathlib import Path
 import typer
 from typing import Annotated
 
-import init_cmd
-import info_cmd
+from cmds import init_cmd, info_cmd
 
 DECK_FILE_NAME = ".deck.json"
 
