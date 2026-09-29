@@ -5,4 +5,4 @@ APP_DIR="$(dirname "${BASH_SOURCE[0]}")"
 # echo "App Directory: $(realpath $APP_DIR/main.py)"
 # echo "Python Directory: $(realpath $APP_DIR/.venv/bin/python)"
 
-exec "$APP_DIR/.venv/bin/python" "$APP_DIR/main.py" "$@"
+exec "$APP_DIR/.venv/bin/python" "$APP_DIR/src/main.py" "$@"

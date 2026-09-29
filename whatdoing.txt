@@ -16,9 +16,9 @@
             play cards in random order
         -[] --tts
             enable text-to-speech for reading out card titles and answers
-    -[] init
+    -[X] init
         Turns a folder of card-like files into a deck of flash cards
-    -[] info
+    -[X] info
         Prints info about the current deck
 -[] async review
     -[] Load all cards
@@ -59,23 +59,28 @@
         -[] If incorrect, move to bucket 0 and ask if the user wants to try again
         -[] If incorrect again, display what the front of the card says and wait for the user to say they are ready to move on to the next card
 -[] init
-    -[] Check if the deck has already been initialized
-        -[] if it has, check when it was last initialized and see if any files have changed since then
-            -[] if they have, inform the user and ask if they want to update the deck's metadata
-        -[] if it has not, create a .deck.json file
-            format:
-                "buckets": [
-                    { "size": int }
-                ],
-                "cards": [
-                    {
-                        "path": "",
-                        "bucket": int,
-                        "async study": bool,
-                    },
-                ],
-            buckets is an array that defines both how many buckets there are and how many cards are allowed to be in each bucket before it is added to a study. setting the bucket to a size of 0 will make the bucket always be added to the study if any cards are inside it.
-            cards is an array that defines each card, which bucket it is sitting in, and whether it is part of an outstanding asynchronous study.
-            -[] Ask the user how many buckets they would like to add. minimum of 1.
-            -[] Then ask how large each bucket should be. if there is only one bucket then don't ask and just set the size to 0. If they just hit enter on the first without entering a number then have the first bucket be 0, second 2, and each subsequent bucket double the previous.
-            -[] recursively look through folders and add each file in the directory as an entry in the json
+    -[X] Check if the deck has already been initialized
+    -[] if it has, check when it was last updated and see if any files have changed since then
+    -[] if they have, inform the user and ask if they want to update the deck's metadata
+    -[X] if it has not, create a .deck.json file
+        format:
+            "last update": date
+            "buckets": [
+                { "size": int }
+            ],
+            "cards": [
+                {
+                    "path": "",
+                    "bucket": int,
+                    "async study": bool,
+                },
+            ],
+        buckets is an array that defines both how many buckets there are and how many cards are allowed to be in each bucket before it is added to a study. setting the bucket to a size of 0 will make the bucket always be added to the study if any cards are inside it.
+        cards is an array that defines each card, which bucket it is sitting in, and whether it is part of an outstanding asynchronous study.
+        -[X] Ask the user how many buckets they would like to add. minimum of 1.
+        -[X] Then ask how large each bucket should be. if there is only one bucket then don't ask and just set the size to 0.
+        -[X] recursively look through folders
+        -[X] add each file in the directory as an entry in the json
+        -[X] Save json file
+-[] info
+    -[] Print how many buckets there are and how many text and image cards are in each

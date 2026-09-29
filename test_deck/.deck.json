@@ -1,0 +1,27 @@
+{
+    "last update": 1790685726.429743,
+    "buckets": [
+        0,
+        2,
+        5,
+        8,
+        14
+    ],
+    "cards": [
+        {
+            "path": "/home/samwi/Documents/Programming/tools/flashcard-tool/test_deck/toast.txt",
+            "bucket": 0,
+            "async study": false
+        },
+        {
+            "path": "/home/samwi/Documents/Programming/tools/flashcard-tool/test_deck/roast.txt",
+            "bucket": 0,
+            "async study": false
+        },
+        {
+            "path": "/home/samwi/Documents/Programming/tools/flashcard-tool/test_deck/b/boast.txt",
+            "bucket": 0,
+            "async study": false
+        }
+    ]
+}
