@@ -20,11 +20,3 @@ def scan_for_files(directory: Path|os.DirEntry[str]) -> list[os.DirEntry[str]]:
             else:
                 files.append(e)
     return files
-
-
-def files_changed(directory: Path|os.DirEntry[str], last_change: float, exclude: list[Path]=[]) -> bool:
-    with os.scandir(directory) as d:
-        for e in d:
-            if e.stat().st_atime > last_change and Path(e.path) not in exclude:
-                return True
-        return False
