@@ -7,23 +7,23 @@ from typing import Any, Union
 from src.utils import safety_utils, file_utils
 
 
-class MissingKey(ValueError):
+class MissingKey(Exception):
     key: str
     object: Any
     def __init__(self, key, object):
         self.key = key
         self.object = object
-class BucketDoesntExist(ValueError):
+class BucketDoesntExist(Exception):
     bucket_index: int
     def __init__(self, bucket_index):
         self.bucket_index = bucket_index
 class DeckNotInitialized(Exception):
     pass
-class FileOpenError(OSError):
+class FileOpenError(Exception):
     error: Exception
     def __init__(self, e):
         self.error = e
-class InvalidJson(ValueError):
+class InvalidJson(Exception):
     msg: str
     def __init__(self, msg):
         self.msg = msg
@@ -39,18 +39,18 @@ DeckLoadError = Union[
 
 class Flashcard:
     path: Path
-    async_study: bool
 
-    def __init__(self, path: Path, async_study: bool = False):
+    def __init__(self, path: Path):
         self.path = path
-        self.async_study = async_study
 
 class Bucket:
     size: int
     cards: list[Flashcard]
+    async_study: bool
 
     def __init__(self, size: int):
         self.size = size
+        self.async_study = False
         self.cards = []
 
 class Deck:
@@ -74,11 +74,11 @@ class Deck:
             return FileOpenError(e)
 
         if not isinstance(deck_json, dict):
-            return InvalidJson(f"JSON should have serialized into a dictionary. " \
-                +"Instead it serialized into '{type(deck_json)}'")
+            return InvalidJson("JSON should have serialized into a dictionary. " \
+                +f"Instead it serialized into '{type(deck_json)}'")
 
-        if "last updated" not in deck_json:
-            return MissingKey("last updated", deck_json)
+        if "last changed" not in deck_json:
+            return MissingKey("last changed", deck_json)
         if "bucket sizes" not in deck_json:
             return MissingKey("bucket sizes", deck_json)
         if "cards" not in deck_json:
@@ -86,7 +86,7 @@ class Deck:
 
 
         deck = Deck()
-        deck.last_changed = deck_json["last updated"]
+        deck.last_changed = deck_json["last changed"]
         for size in deck_json["bucket sizes"]:
             deck.buckets.append(Bucket(size))
         for card_json in deck_json["cards"]:
@@ -101,10 +101,9 @@ class Deck:
             if 0 > bucket > len(deck.buckets):
                 return BucketDoesntExist(bucket)
 
-            deck.buckets[bucket].append(Flashcard(
-                card_json["path"],
-                card_json["async study"]
-            ))
+            deck.buckets[bucket].cards.append(Flashcard(card_json["path"]))
+            if card_json["async study"]:
+                deck.buckets[bucket].async_study = True
 
         return deck
 
@@ -156,7 +155,23 @@ class Deck:
 
         return deck
 
-    # def try_save(self, deck_directory: Path) -> None|FileOpenError:
-    #     try:
-    #         with open(deck_directory/".deck.json", "w") as f:
-    #             json.dump()
+    def try_save(self, deck_directory: Path) -> None|FileOpenError:
+        deck_json = {
+            "last changed": self.last_changed.timestamp(),
+            "bucket sizes": [],
+            "cards": []
+        }
+        for n, bucket in enumerate(self.buckets):
+            deck_json["bucket sizes"].append(bucket.size)
+            for card in bucket.cards:
+                deck_json["cards"].append({
+                    "path": card.path.as_posix(),
+                    "bucket": n,
+                    "async study": bucket.async_study,
+                })
+
+        try:
+            with open(deck_directory/".deck.json", "w") as f:
+                json.dump(deck_json, f)
+        except Exception as e:
+            return FileOpenError(e)
